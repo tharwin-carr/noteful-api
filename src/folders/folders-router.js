@@ -66,6 +66,28 @@ foldersRouter
 .get((req, res, next) => {
     res.json(serializeFolder(res.folder))
 })
+.patch(jsonParser, (req, res, next) => {
+    const { title } = req.body
+    const folderToUpdate = name
+
+    const numberOfValues = Object.values(folderToUpdate).filter(Boolean).length
+    if (numberOfValues === 0) {
+        return res.status(400).json({
+            error: { 
+                message: `Request body must contain name`
+            }
+        })
+    }
+    FoldersService.updateFolder(
+        req.app.get('db'),
+        req.params.folder_id,
+        folderToUpdate
+    )
+    .then(numRowsAffected => {
+        res.status(204).end()
+    })
+    .catch(next)
+})
 .delete((req, res, next) => {
     FoldersService.deleteFolder(
         req.app.get('db'),

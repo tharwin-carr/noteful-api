@@ -24,7 +24,7 @@ notesRouter
         })
         .catch(next)
 })
-.post(jsonParser, (req, res, json) => {
+.post(jsonParser, (req, res, next) => {
     const { name, folderId, content } = req.body
     const newNote = { name, folderId, content }
 
@@ -67,6 +67,29 @@ notesRouter
     })
     .get((req, res, next) => {
         res.json(serializeNote(res.note))
+    })
+    .patch(jsonParser, (req, res, next) => {
+        const { name, folderId, content } = req.body
+        const noteToUpdate = { name, folderId, content }
+
+        const numberOfValues = Object.values(noteToUpdate).filter(Boolean).length
+        if (numberOfValues === 0) {
+            return res.status(400).json({
+                error: {
+                    message: `Request body must contain either 'name folderId or content`
+                }
+            })
+        }
+
+        NotesService.updateNote(
+            req.app.get('db'),
+            req.params.noteId,
+            noteToUpdate
+        )
+            .then(numRowsAffected => {
+                res.status(204).end
+            })
+            .catch(next)
     })
     .delete((req, res, next) => {
         NotesService.deleteNote(
