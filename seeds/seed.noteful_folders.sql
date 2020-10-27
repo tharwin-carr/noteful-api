@@ -1,4 +1,4 @@
-INSERT INTO noteful_folders (name)
+INSERT INTO noteful_folders (title)
 VALUES
 ('Important'),
 ('Super'),

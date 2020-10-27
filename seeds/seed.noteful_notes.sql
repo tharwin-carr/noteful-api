@@ -1,4 +1,4 @@
-INSERT INTO noteful_notes (name, folderId, content)
+INSERT INTO noteful_notes (title, folder_id, content)
 VALUES
 ('Random', 1, 'This is the first note'),
 ('Bloc', 2, 'This is the second note'),

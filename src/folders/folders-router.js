@@ -9,7 +9,7 @@ const jsonParser = express.json()
 //What does this do?
 const serializeFolder = folder => ({
     id: folder.id,
-    name: xss(folder.name),
+    title: xss(folder.title),
 })
 
 foldersRouter
@@ -23,14 +23,16 @@ foldersRouter
         .catch(next)
 })
 .post(jsonParser, (req, res, next) => {
-    const { name } = req.body
-    const newFolder = { name }
+    const { title } = req.body
+    const newFolder = { title }
 
-    for(const [key, value] of Object.entries(newFolder))
-        if(value == null)
-        return res.status(400).json({
-            error: { message: `Missing ${key} in request body` }
-        })
+    for(const [key, value] of Object.entries(newFolder)) {
+        if(value == null) {
+            return res.status(400).json({
+                error: { message: `Missing ${key} in request body` }
+            })
+        }
+    }
 
     FoldersService.insertFolder(
         req.app.get('db'),
@@ -46,11 +48,11 @@ foldersRouter
 })
 
 foldersRouter
-.route('/:folderId')
+.route('/:folder_id')
 .all((req, res, next) => {
     FoldersService.getById(
         req.app.get('db'),
-        req.params.folderId
+        req.params.folder_id
     )
     .then(folder => {
         if(!folder) {
@@ -68,13 +70,13 @@ foldersRouter
 })
 .patch(jsonParser, (req, res, next) => {
     const { title } = req.body
-    const folderToUpdate = name
+    const folderToUpdate = title
 
     const numberOfValues = Object.values(folderToUpdate).filter(Boolean).length
     if (numberOfValues === 0) {
         return res.status(400).json({
             error: { 
-                message: `Request body must contain name`
+                message: `Request body must contain title`
             }
         })
     }
@@ -91,10 +93,10 @@ foldersRouter
 .delete((req, res, next) => {
     FoldersService.deleteFolder(
         req.app.get('db'),
-        req.params.folderId
+        req.params.folder_id
     )
     .then(numRowsAffected => {
-        res.status(204).end
+        res.status(204).end()
     })
     .catch(next)
 })

@@ -8,9 +8,9 @@ const jsonParser = express.json()
 
 const serializeNote = note => ({
     id: note.id,
-    name: xss(note.name),
+    title: xss(note.title),
     modified: note.modified,
-    folderId: xss(note.folderId),
+    folder_id: xss(note.folder_id),
     content: xss(note.content)
 })
 
@@ -25,8 +25,8 @@ notesRouter
         .catch(next)
 })
 .post(jsonParser, (req, res, next) => {
-    const { name, folderId, content } = req.body
-    const newNote = { name, folderId, content }
+    const { title, folder_id, content } = req.body
+    const newNote = { title, folder_id, content }
 
     for (const [key, value] of Object.entries(newNote))
         if (value == null)
@@ -69,21 +69,21 @@ notesRouter
         res.json(serializeNote(res.note))
     })
     .patch(jsonParser, (req, res, next) => {
-        const { name, folderId, content } = req.body
-        const noteToUpdate = { name, folderId, content }
+        const { title, folder_id, content } = req.body
+        const noteToUpdate = { title, folder_id, content }
 
         const numberOfValues = Object.values(noteToUpdate).filter(Boolean).length
         if (numberOfValues === 0) {
             return res.status(400).json({
                 error: {
-                    message: `Request body must contain either 'name folderId or content`
+                    message: `Request body must contain either 'title folder_id or content'`
                 }
             })
         }
 
         NotesService.updateNote(
             req.app.get('db'),
-            req.params.noteId,
+            req.params.note.id,
             noteToUpdate
         )
             .then(numRowsAffected => {
@@ -94,7 +94,7 @@ notesRouter
     .delete((req, res, next) => {
         NotesService.deleteNote(
             req.app.get('db'),
-            req.params.noteId
+            req.params.note.id
         )
         .then(numRowsAffected => {
             res.status(204).end()
