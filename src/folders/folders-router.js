@@ -24,26 +24,27 @@ foldersRouter
 })
 .post(jsonParser, (req, res, next) => {
     const { title } = req.body
-    const newFolder = { title }
+    const newFolder = {title}
 
-    for(const [key, value] of Object.entries(newFolder)) {
-        if(value == null) {
-            return res.status(400).json({
-                error: { message: `Missing ${key} in request body` }
-            })
+    for (const [key, value] of Object.entries(newFolder)) {
+       if (value == null) {
+        return res.status(400).json({
+        error: { message: `Missing '${key}' in request body` }
+        })
         }
     }
 
+    newFolder.title = title
     FoldersService.insertFolder(
-        req.app.get('db'),
-        newFolder
+      req.app.get('db'),
+      newFolder
     )
     .then(folder => {
         res
-            .status(201)
-            .location(path.posix.join(req.originalUrl, `/${folder.id}`))
-            .json(serializeFolder(folder))
-    })
+          .status(201)
+          .location(path.posix.join(req.originalUrl, `/${folder.id}`))
+          .json(serializeFolder(folder))
+      })
     .catch(next)
 })
 
@@ -95,7 +96,7 @@ foldersRouter
         req.app.get('db'),
         req.params.folder_id
     )
-    .then(numRowsAffected => {
+    .then((numRowsAffected) => {
         res.status(204).end()
     })
     .catch(next)

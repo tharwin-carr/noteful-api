@@ -6,7 +6,7 @@ const FoldersService = {
         return knex
             .insert(newFolder)
             .into('noteful_folders')
-            .return('*')
+            .returning('*')
             .then(rows => {
                 return rows[0]
             })
@@ -18,7 +18,7 @@ const FoldersService = {
             .where('id', id)
             .first()
     },
-    deleteFolder(knew, id) {
+    deleteFolder(knex, id) {
         return knex('noteful_folders')
         .where({ id })
         .delete()
