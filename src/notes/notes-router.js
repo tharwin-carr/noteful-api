@@ -10,7 +10,7 @@ const serializeNote = note => ({
     id: note.id,
     title: xss(note.title),
     modified: note.modified,
-    folder_id: xss(note.folder_id),
+    folder_id: note.folder_id,
     content: xss(note.content)
 })
 
@@ -34,25 +34,25 @@ notesRouter
                 error: { message: `Missing ${key} in request body` }
             })
         }
-    }
+  }
     NotesService.insertNote(
         req.app.get('db'),
         newNote
     )
     .then(note => {
         res.status(201)
-        .location(path.posix.join(req.originalUrl, `/{note.id}`))
+        .location(path.posix.join(req.originalUrl, `/${note.id}`))
         .json(serializeNote(note))
     })
     .catch(next)
 })
 
 notesRouter
-    .route('/:note_id')
+    .route('/:id')
     .all((req, res, next) => {
         NotesService.getById(
             req.app.get('db'),
-            req.params.note_id
+            req.params.id
         )
         .then(note => {
             if(!note) {
@@ -83,7 +83,7 @@ notesRouter
 
         NotesService.updateNote(
             req.app.get('db'),
-            req.params.note_id,
+            req.params.id,
             noteToUpdate
         )
             .then(numRowsAffected => {
@@ -94,7 +94,7 @@ notesRouter
     .delete((req, res, next) => {
         NotesService.deleteNote(
             req.app.get('db'),
-            req.params.note_id
+            req.params.id
         )
         .then(numRowsAffected => {
             res.status(204).end()
